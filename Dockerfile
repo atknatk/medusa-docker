@@ -25,15 +25,7 @@ FROM node:20-alpine
 ENV USER_NAME=medusa
 ENV USER_HOME=/home/$USER_NAME
 ENV PROJECT_NAME=medusa-app
-
-# Default environment variables (can be overridden at runtime)
-ENV STORE_CORS=http://localhost:8000,https://docs.medusajs.com
-ENV ADMIN_CORS=http://localhost:5173,http://localhost:9000,https://docs.medusajs.com
-ENV AUTH_CORS=http://localhost:5173,http://localhost:9000,https://docs.medusajs.com
-ENV REDIS_URL=redis://localhost:6379
-ENV JWT_SECRET=supersecret
-ENV COOKIE_SECRET=supersecret
-ENV DATABASE_URL=postgres://medusa:medusa@localhost:5432/medusa
+RUN apk add --no-cache bash
 
 # Create the non-root user in the production stage
 RUN adduser -D -h $USER_HOME -s /bin/sh $USER_NAME
@@ -44,6 +36,17 @@ WORKDIR /usr/src/app
 # Copy the Medusa application from the builder stage
 COPY --from=builder /usr/src/app/medusa-app /usr/src/app/
 
+# Create the .medusa directory and give ownership to the non-root user
+RUN mkdir -p /usr/src/app/.medusa
+RUN chown -R $USER_NAME:$USER_NAME /usr/src/app
+
+# Copy the run.sh script and make it executable
+COPY ./script/run.sh /usr/src/app/run.sh
+RUN chmod +x /usr/src/app/run.sh
+
+# Install medusa-cli globally
+RUN npm i -g medusa-cli
+
 # Switch to the non-root user
 USER $USER_NAME
 
@@ -51,4 +54,4 @@ USER $USER_NAME
 EXPOSE 9000
 
 # Define the entrypoint to the application
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["/usr/src/app/run.sh", "start:prod"]

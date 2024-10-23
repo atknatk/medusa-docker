@@ -1,6 +1,7 @@
 #!/usr/bin/expect -f
 
-spawn create-medusa-app medusa --no-browser "yes" --skip-db "yes" --with-nextjs-starter "no"
+npm i -g create-medusa-app@2.0.0 
+spawn create-medusa-app --no-browser "yes" --skip-db "yes"
 expect "What's the name of your project?"
 send "medusa-app\r"
 interact

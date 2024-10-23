@@ -1,7 +1,7 @@
 # Variables
 DOCKER_IMAGE_NAME = medusa
 DOCKER_REGISTRY = atknatk
-VERSION = v2.0.0-rc.7
+VERSION = v2.0.0
 PLATFORMS = linux/amd64,linux/arm64
 
 # Default target
